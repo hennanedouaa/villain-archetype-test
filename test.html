@@ -3,9 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Villain Archetype Quiz</title>
+  <title>Villain Archetype Personality Test</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    body {
+      font-family: 'Arial', sans-serif;
+    }
+    .hero {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    .archetype-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      margin: 0 0.5rem;
+    }
+    .archetype-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    .card-image {
+      border-top-left-radius: 0.5rem;
+      border-top-right-radius: 0.5rem;
+    }
     .question-inactive {
       opacity: 0.4;
       pointer-events: none;
@@ -138,8 +156,8 @@
       border-radius: 10px;
     }
     .flat-button {
-      background-color: #e0e0e0;
-      color: #333;
+      background-color: #2E5F36;
+      color: white;
       border: none;
       padding: 8px 16px;
       border-radius: 4px;
@@ -149,17 +167,73 @@
       margin-right: 10px;
     }
     .flat-button:hover {
-      background-color: #d0d0d0;
+      background-color: #1E3F26;
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen">
+<body class="bg-gray-100">
+  <!-- Landing Section -->
+  <div id="landingSection" class="hero min-h-screen flex flex-col items-center justify-center text-center px-4">
+    <div class="max-w-2xl mt-40 mx-auto">
+      <h1 class="text-4xl font-bold text-gray-800 mb-6">Discover Your Villain Archetype</h1>
+      <p class="text-lg text-gray-600 mb-8">
+        Each person embodies a unique villain archetype. Scientifically, there are three primary villain archetypes that people resonate with the most. Take our quiz to find out which villain archetype you embody!
+      </p>
+      <button onclick="startQuiz()" class="flat-button">
+        Take the Quiz
+      </button>
+    </div>
+    <!-- Archetypes Cards -->
+    <div class="container mx-auto my-30  px-4 py-12">
+      <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">The Three Villain Archetypes</h2>
+      <div class="flex flex-col md:flex-row justify-center">
+        <!-- Bitch Archetype Card -->
+        <div class="archetype-card bg-white rounded-lg shadow-md overflow-hidden max-w-sm w-full mb-4 md:mb-0">
+          <div class="w-full">
+            <img id="bitchImage" src="bitch_female.png" alt="Bitch Archetype" class="w-full card-image">
+          </div>
+          <div class="p-4">
+            <h3 class="text-xl font-bold text-purple-800 mb-2">The Bitch</h3>
+            <p class="text-gray-700">
+              The Mastermind: Strategic and self-serving, this archetype is driven by personal goals and will navigate any obstacle to achieve them. Their actions are not personal but are calculated steps towards their ambitions.
+            </p>
+          </div>
+        </div>
+        <!-- Whore Archetype Card -->
+        <div class="archetype-card bg-white rounded-lg shadow-md overflow-hidden max-w-sm w-full mb-4 md:mb-0">
+          <div class="w-full">
+            <img id="whoreImage" src="whore_male.png" alt="Whore Archetype" class="w-full card-image">
+          </div>
+          <div class="p-4">
+            <h3 class="text-xl font-bold text-red-800 mb-2">The Whore</h3>
+            <p class="text-gray-700">
+              The Chaos Creator: Thrives on creating discord and enjoys the turmoil they cause. They act out of spite and find pleasure in disrupting the peace, often without a clear motive.
+            </p>
+          </div>
+        </div>
+        <!-- Slut Archetype Card -->
+        <div class="archetype-card bg-white rounded-lg shadow-md overflow-hidden max-w-sm w-full">
+          <div class="w-full">
+            <img id="slutImage" src="slut_female.png" alt="Slut Archetype" class="w-full card-image">
+          </div>
+          <div class="p-4">
+            <h3 class="text-xl font-bold text-green-800 mb-2">The Slut</h3>
+            <p class="text-gray-700">
+              The Attention Seeker: Desperate for validation, this archetype will adapt their behavior to gain approval. They may engage in negative actions to secure their place in the spotlight or someone's affection.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- Gender Selection -->
-  <div id="genderSection" class="min-h-screen flex items-center justify-center p-4">
+  <div id="genderSection" class="min-h-screen flex items-center justify-center p-4 hidden">
     <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8">
       <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">Villain Archetype Quiz</h1>
       <div class="flex gap-4">
-        <button onclick="startQuiz()" class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">Start Quiz</button>
+        <button onclick="startQuizQuestions()" class="flat-button">
+          Start Quiz
+        </button>
       </div>
     </div>
   </div>
@@ -183,7 +257,7 @@
       <!-- Submit Button -->
       <div id="submitContainer" class="hidden pt-8">
         <div class="text-center">
-          <button id="submitBtn" type="button" onclick="submitQuiz()" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-12 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+          <button id="submitBtn" type="button" onclick="submitQuiz()" class="flat-button">
             Get Your Result
           </button>
         </div>
@@ -295,10 +369,9 @@
       highly_disagree: -7
     };
     function startQuiz() {
-      document.getElementById("genderSection").classList.add("hidden");
+      document.getElementById("landingSection").classList.add("hidden");
       document.getElementById("quizSection").classList.remove("hidden");
       renderQuestions();
-      updateProgress();
     }
     function renderQuestions() {
       const form = document.getElementById("quizForm");
@@ -446,12 +519,33 @@
     }
     function retryQuiz() {
       document.getElementById("resultSection").classList.add("hidden");
-      document.getElementById("genderSection").classList.remove("hidden");
+      document.getElementById("landingSection").classList.remove("hidden");
       selectedGender = null;
       currentQuestion = 0;
       answeredQuestions = 0;
       updateProgress();
     }
+    function randomizeImages() {
+      const bitchImage = document.getElementById('bitchImage');
+      const whoreImage = document.getElementById('whoreImage');
+      const slutImage = document.getElementById('slutImage');
+      if (Math.random() > 0.5) {
+        bitchImage.src = 'bitch_male.png';
+      } else {
+        bitchImage.src = 'bitch_female.png';
+      }
+      if (Math.random() > 0.5) {
+        whoreImage.src = 'whore_male.png';
+      } else {
+        whoreImage.src = 'whore_female.png';
+      }
+      if (Math.random() > 0.5) {
+        slutImage.src = 'slut_male.png';
+      } else {
+        slutImage.src = 'slut_female.png';
+      }
+    }
+    window.onload = randomizeImages;
   </script>
 </body>
 </html>
