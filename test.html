@@ -184,7 +184,7 @@
       </button>
     </div>
     <!-- Archetypes Cards -->
-    <div class="container mx-auto my-30  px-4 py-12">
+    <div class="container mx-auto my-30 px-4 py-12">
       <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">The Three Villain Archetypes</h2>
       <div class="flex flex-col md:flex-row justify-center">
         <!-- Bitch Archetype Card -->
@@ -360,13 +360,13 @@
       }
     };
     const answerValues = {
-      highly_agree: 7,
-      agree: 5,
-      slightly_agree: 3,
+      highly_agree: 3,
+      agree: 2,
+      slightly_agree: 1,
       neutral: 0,
-      slightly_disagree: -3,
-      disagree: -5,
-      highly_disagree: -7
+      slightly_disagree: -1,
+      disagree: -2,
+      highly_disagree: -3
     };
     function startQuiz() {
       document.getElementById("landingSection").classList.add("hidden");
@@ -490,7 +490,7 @@
         whore: Math.round((Math.abs(scores.whore) / total) * 100),
         slut: Math.round((Math.abs(scores.slut) / total) * 100)
       };
-      let highestType = Object.keys(scores).reduce((a, b) => Math.abs(scores[a]) > Math.abs(scores[b]) ? a : b);
+      let highestType = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
       const result = resultsData[highestType];
       document.getElementById("resultImage").src = `${highestType}_${selectedGender}.png`;
       document.getElementById("resultTitle").innerHTML = result.title;
