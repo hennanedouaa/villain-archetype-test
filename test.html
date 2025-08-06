@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Villain Archetype Quiz</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .question-inactive {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .question-active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .progress-bar {
+      transition: width 0.3s ease;
+    }
+    .question-transition {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .archetype-emphasis {
+      font-size: 32px;
+      font-weight: bold;
+    }
+    .bitch-color {
+      color: #6A0DAD;
+    }
+    .whore-color {
+      color: #B22222;
+    }
+    .slut-color {
+      color: #228B22;
+    }
+    .result-container {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      background-color: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 1200px;
+      width: 95%;
+      margin: 20px auto;
+    }
+    .result-image-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #fff;
+      padding: 30px;
+    }
+    .result-image-container img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 15px;
+    }
+    .result-content {
+      flex: 2;
+      padding: 30px;
+    }
+    .result-title {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    .result-subtitle {
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    .result-description {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+    .stats {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .stat-label {
+      font-size: 14px;
+      color: #666;
+      min-width: 100px;
+    }
+    .stat-value {
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .stat-bar-container {
+      flex-grow: 1;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      height: 10px;
+    }
+    .stat-bar {
+      height: 100%;
+      border-radius: 5px;
+    }
+    .stat-percentage {
+      min-width: 40px;
+      text-align: right;
+    }
+    .bg-bitch { background-color: #6A0DAD; }
+    .bg-whore { background-color: #B22222; }
+    .bg-slut { background-color: #228B22; }
+    @media (max-width: 768px) {
+      .result-container {
+        flex-direction: column;
+        width: 95%;
+      }
+      .result-image-container {
+        padding: 15px;
+      }
+      .result-image-container img {
+        max-width: 80%;
+      }
+      .result-content {
+        padding: 20px;
+      }
+    }
+    .archetype-description {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+    }
+    .flat-button {
+      background-color: #e0e0e0;
+      color: #333;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-right: 10px;
+    }
+    .flat-button:hover {
+      background-color: #d0d0d0;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen">
+  <!-- Gender Selection -->
+  <div id="genderSection" class="min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8">
+      <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">Villain Archetype Quiz</h1>
+      <div class="flex gap-4">
+        <button onclick="startQuiz()" class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">Start Quiz</button>
+      </div>
+    </div>
+  </div>
+  <!-- Quiz Section -->
+  <div id="quizSection" class="min-h-screen hidden">
+    <!-- Progress Bar -->
+    <div class="sticky top-0 bg-white border-b border-gray-200 z-10">
+      <div class="max-w-4xl mx-auto px-6 py-4">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-lg font-semibold text-gray-800">Villain Archetype Quiz</h2>
+          <span id="progressText" class="text-sm text-gray-600">0 / 16</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div id="progressBar" class="progress-bar bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Questions Container -->
+    <div class="max-w-4xl mx-auto px-6 py-8">
+      <form id="quizForm" class="space-y-12"></form>
+      <!-- Submit Button -->
+      <div id="submitContainer" class="hidden pt-8">
+        <div class="text-center">
+          <button id="submitBtn" type="button" onclick="submitQuiz()" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-12 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+            Get Your Result
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Result Section -->
+  <div id="resultSection" class="min-h-screen flex items-center justify-center p-6 hidden">
+    <div class="result-container">
+      <!-- Character Image -->
+      <div class="result-image-container">
+        <img id="resultImage" src="" alt="Archetype Portrait">
+      </div>
+      <!-- Content -->
+      <div class="result-content">
+        <h2 id="resultTitle" class="result-title"></h2>
+        <p id="resultSubtitle" class="result-subtitle"></p>
+        <p id="resultDescription" class="result-description"></p>
+        <!-- Percentages -->
+        <div id="percentages" class="stats"></div>
+        <!-- Buttons -->
+        <div class="text-center mt-6">
+          <button onclick="toggleArchetypeDescriptions()" class="flat-button">
+            Discover the Archetypes
+          </button>
+          <button onclick="retryQuiz()" class="flat-button">
+            Retry
+          </button>
+        </div>
+        <!-- Archetype Descriptions -->
+        <div id="archetypeDescriptions" class="archetype-description">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Archetype Descriptions</h3>
+          <div class="space-y-4">
+            <div class="p-4 bg-white rounded-lg shadow">
+              <h4 class="text-lg font-semibold bitch-color">Bitch – The Mastermind Villain</h4>
+              <p class="text-gray-700">They are the architects of their own destiny. Always thinking five steps ahead, they will stop at nothing to achieve their goals — even if it means stepping over anyone in their way. For them, it's never personal; it's simply the art of winning.</p>
+            </div>
+            <div class="p-4 bg-white rounded-lg shadow">
+              <h4 class="text-lg font-semibold whore-color">Whore – The Chaos Villain</h4>
+              <p class="text-gray-700">They were born to stir the pot. Drama follows them not because they need it, but because they can. They speak without a filter, throw shade with precision, and ensure no one ever forgets their presence. Their cruelty isn't strategic — it's instinct.</p>
+            </div>
+            <div class="p-4 bg-white rounded-lg shadow">
+              <h4 class="text-lg font-semibold slut-color">Slut – The Manipulative Villain</h4>
+              <p class="text-gray-700">They know how to work a room, charm their way into hearts, and keep themselves in the spotlight. But beneath the charm lies a desperate need for validation. They bend their morals, align with power, and join in on cruelty if it means protecting their place in someone's heart — or staying at the center of attention.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    let selectedGender = null;
+    let currentQuestion = 0;
+    let answeredQuestions = 0;
+    const questions = [
+      { q: "I feel uncomfortable challenging people in positions of authority.", type: "slut" },
+      { q: "I enjoy stirring things up just to see what happens.", type: "whore" },
+      { q: "I secretly believe most people are beneath me.", type: "bitch" },
+      { q: "I sometimes agree with people just to avoid upsetting them.", type: "slut" },
+      { q: "It bothers me to see people get things I worked hard for easily.", type: "bitch" },
+      { q: "If I don't like someone, I'll find a way to make them feel it.", type: "whore" },
+      { q: "I often adjust my behavior to match the people I'm with.", type: "slut" },
+      { q: "I often find indirect ways to get what I want from others.", type: "bitch" },
+      { q: "If someone misunderstands me, that's their problem — not mine.", type: "whore" },
+      { q: "I believe you should always put your own success above helping others.", type: "bitch" },
+      { q: "Being liked by others matters more to me than expressing my true thoughts.", type: "slut" },
+      { q: "I often feel the need to prove I'm better, even in small situations.", type: "bitch" },
+      { q: "I don't mind making someone feel bad if they annoy me.", type: "whore" },
+      { q: "I sometimes provoke people just to see their reaction.", type: "whore" },
+      { q: "I find it difficult to stand up for myself in disagreements.", type: "slut" },
+      { q: "Select your gender:", type: "gender" }
+    ];
+    const resultsData = {
+      bitch: {
+        title: "<span class='archetype-emphasis bitch-color'>Bitch</span> – The Mastermind Villain",
+        subtitle: "Self-Serving • Calculated • Ruthless",
+        description: "They are the architects of their own destiny. Always thinking five steps ahead, they will stop at nothing to achieve their goals — even if it means stepping over anyone in their way. For them, it's never personal; it's simply the art of winning. They command respect, manipulate situations in their favor, and know exactly how to position themselves to win. Their selfishness is not hidden — it's part of their strength. To them, kindness is a luxury, and winning is survival.",
+        color: "bg-bitch",
+        overlay: "bg-purple-900",
+        cardColor: "from-purple-600 to-purple-800",
+        stats: { cunning: 5, power: 4, charm: 3 }
+      },
+      whore: {
+        title: "<span class='archetype-emphasis whore-color'>Whore</span> – The Chaos Villain",
+        subtitle: "Blunt • Unfiltered • Firestarter",
+        description: "They were born to stir the pot. Drama follows them not because they need it, but because they can. They speak without a filter, throw shade with precision, and ensure no one ever forgets their presence. Their cruelty isn't strategic — it's instinct. They thrive in chaos, feed off conflict, and find satisfaction in making others squirm. Inherently spiteful, they don't need a reason to create problems; sometimes, watching the world burn is reason enough.",
+        color: "bg-whore",
+        overlay: "bg-red-900",
+        cardColor: "from-red-600 to-red-800",
+        stats: { cunning: 3, power: 5, charm: 2 }
+      },
+      slut: {
+        title: "<span class='archetype-emphasis slut-color'>Slut</span> – The Manipulative Villain",
+        subtitle: "Charming • Approval-Seeking • Spotlight Hunter",
+        description: "They know how to work a room, charm their way into hearts, and keep themselves in the spotlight. But beneath the charm lies a desperate need for validation. They bend their morals, align with power, and join in on cruelty if it means protecting their place in someone's heart — or staying at the center of attention. Their villainy often hides behind a smile, but make no mistake: they will gladly tear someone down if it keeps their image intact and their ego fed.",
+        color: "bg-slut",
+        overlay: "bg-green-900",
+        cardColor: "from-green-600 to-green-800",
+        stats: { cunning: 4, power: 3, charm: 5 }
+      }
+    };
+    const answerValues = {
+      highly_agree: 7,
+      agree: 5,
+      slightly_agree: 3,
+      neutral: 0,
+      slightly_disagree: -3,
+      disagree: -5,
+      highly_disagree: -7
+    };
+    function startQuiz() {
+      document.getElementById("genderSection").classList.add("hidden");
+      document.getElementById("quizSection").classList.remove("hidden");
+      renderQuestions();
+      updateProgress();
+    }
+    function renderQuestions() {
+      const form = document.getElementById("quizForm");
+      form.innerHTML = "";
+      questions.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = `question-block question-transition ${index === 0 ? 'question-active' : 'question-inactive'} p-8 bg-white rounded-2xl shadow-lg border border-gray-100`;
+        div.dataset.index = index;
+        if (item.type === "gender") {
+          div.innerHTML = `
+            <div class="text-center">
+              <h3 class="text-xl font-semibold text-gray-800 mb-8">${item.q}</h3>
+              <div class="flex gap-6 justify-center">
+                <label class="cursor-pointer group">
+                  <input type="radio" name="q${index}" value="male" class="hidden peer" onchange="handleAnswer(${index})" />
+                  <div class="px-8 py-4 border-2 border-gray-300 rounded-xl transition-all duration-200 peer-checked:border-blue-500 peer-checked:bg-blue-50 group-hover:border-blue-400">
+                    <span class="text-lg font-medium text-gray-700 peer-checked:text-blue-600">Male</span>
+                  </div>
+                </label>
+                <label class="cursor-pointer group">
+                  <input type="radio" name="q${index}" value="female" class="hidden peer" onchange="handleAnswer(${index})" />
+                  <div class="px-8 py-4 border-2 border-gray-300 rounded-xl transition-all duration-200 peer-checked:border-pink-500 peer-checked:bg-pink-50 group-hover:border-pink-400">
+                    <span class="text-lg font-medium text-gray-700 peer-checked:text-pink-600">Female</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          `;
+        } else {
+          div.innerHTML = `
+            <div class="text-center">
+              <h3 class="text-xl font-semibold text-gray-800 mb-8">${item.q}</h3>
+              <div class="flex items-center justify-center gap-4 max-w-md mx-auto">
+                <span class="text-[#39A778] text-sm font-medium mr-2">Agree</span>
+                ${["highly_agree", "agree", "slightly_agree", "neutral", "slightly_disagree", "disagree", "highly_disagree"].map((val, i) => {
+                  let colorClass = '';
+                  let size = '';
+                  const sizes = ['w-6 h-6', 'w-5 h-5', 'w-4 h-4', 'w-3 h-3', 'w-4 h-4', 'w-5 h-5', 'w-6 h-6'];
+                  size = sizes[i];
+                  if (i < 3) {
+                    colorClass = 'border-[#39A778] hover:border-[#2d8460] peer-checked:bg-[#39A778] peer-checked:border-[#39A778]';
+                  } else if (i === 3) {
+                    colorClass = 'border-gray-400 hover:border-gray-500 peer-checked:bg-gray-400 peer-checked:border-gray-400';
+                  } else {
+                    colorClass = 'border-[#88619A] hover:border-[#7a5589] peer-checked:bg-[#88619A] peer-checked:border-[#88619A]';
+                  }
+                  return `
+                    <label class="cursor-pointer group flex items-center justify-center">
+                      <input type="radio" name="q${index}" value="${val}" class="hidden peer" onchange="handleAnswer(${index})" />
+                      <div class="${size} rounded-full border-2 transition-all duration-200 ${colorClass} group-hover:scale-110 peer-checked:scale-125 peer-checked:shadow-lg"></div>
+                    </label>
+                  `;
+                }).join("")}
+                <span class="text-[#88619A] text-sm font-medium ml-2">Disagree</span>
+              </div>
+            </div>
+          `;
+        }
+        form.appendChild(div);
+      });
+    }
+    function handleAnswer(questionIndex) {
+      const answer = document.querySelector(`input[name="q${questionIndex}"]:checked`).value;
+      if (questions[questionIndex].type === "gender") {
+        selectedGender = answer;
+      }
+      answeredQuestions = Math.max(answeredQuestions, questionIndex + 1);
+      updateProgress();
+      const blocks = document.querySelectorAll(".question-block");
+      if (questionIndex < questions.length - 1) {
+        const nextIndex = questionIndex + 1;
+        blocks[questionIndex].classList.remove("question-active");
+        blocks[questionIndex].classList.add("question-inactive");
+        blocks[nextIndex].classList.remove("question-inactive");
+        blocks[nextIndex].classList.add("question-active");
+        setTimeout(() => {
+          blocks[nextIndex].scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'nearest'
+          });
+        }, 100);
+        currentQuestion = nextIndex;
+      } else {
+        blocks[questionIndex].classList.remove("question-active");
+        blocks[questionIndex].classList.add("question-inactive");
+        document.getElementById("submitContainer").classList.remove("hidden");
+        setTimeout(() => {
+          document.getElementById("submitContainer").scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+        }, 100);
+      }
+    }
+    function updateProgress() {
+      const progress = (answeredQuestions / questions.length) * 100;
+      document.getElementById("progressBar").style.width = progress + "%";
+      document.getElementById("progressText").textContent = `${answeredQuestions} / ${questions.length}`;
+    }
+    function submitQuiz() {
+      let scores = { bitch: 0, whore: 0, slut: 0 };
+      for (let i = 0; i < questions.length; i++) {
+        const answer = document.querySelector(`input[name="q${i}"]:checked`);
+        if (!answer) {
+          alert("Please answer all questions!");
+          return;
+        }
+        if (questions[i].type !== "gender") {
+          scores[questions[i].type] += answerValues[answer.value];
+        }
+      }
+      const total = Object.values(scores).reduce((a, b) => a + Math.abs(b), 0) || 1;
+      const percentages = {
+        bitch: Math.round((Math.abs(scores.bitch) / total) * 100),
+        whore: Math.round((Math.abs(scores.whore) / total) * 100),
+        slut: Math.round((Math.abs(scores.slut) / total) * 100)
+      };
+      let highestType = Object.keys(scores).reduce((a, b) => Math.abs(scores[a]) > Math.abs(scores[b]) ? a : b);
+      const result = resultsData[highestType];
+      document.getElementById("resultImage").src = `${highestType}_${selectedGender}.png`;
+      document.getElementById("resultTitle").innerHTML = result.title;
+      document.getElementById("resultSubtitle").textContent = result.subtitle;
+      document.getElementById("resultDescription").textContent = result.description;
+      const percentHTML = Object.keys(percentages).map(type => `
+        <div class="stat">
+          <span class="stat-label">${type}</span>
+          <div class="stat-bar-container">
+            <div class="stat-bar ${resultsData[type].color}" style="width: ${percentages[type]}%"></div>
+          </div>
+          <span class="stat-percentage">${percentages[type]}%</span>
+        </div>
+      `).join("");
+      document.getElementById("percentages").innerHTML = percentHTML;
+      document.getElementById("quizSection").classList.add("hidden");
+      document.getElementById("resultSection").classList.remove("hidden");
+    }
+    function toggleArchetypeDescriptions() {
+      const descriptions = document.getElementById("archetypeDescriptions");
+      if (descriptions.style.display === "none" || !descriptions.style.display) {
+        descriptions.style.display = "block";
+      } else {
+        descriptions.style.display = "none";
+      }
+    }
+    function retryQuiz() {
+      document.getElementById("resultSection").classList.add("hidden");
+      document.getElementById("genderSection").classList.remove("hidden");
+      selectedGender = null;
+      currentQuestion = 0;
+      answeredQuestions = 0;
+      updateProgress();
+    }
+  </script>
+</body>
+</html>
