@@ -330,6 +330,7 @@
       { q: "I find it difficult to stand up for myself in disagreements.", type: "slut" },
       { q: "Select your gender:", type: "gender" }
     ];
+
     const resultsData = {
       bitch: {
         title: "<span class='archetype-emphasis bitch-color'>Bitch</span> – The Mastermind Villain",
@@ -359,6 +360,7 @@
         stats: { cunning: 4, power: 3, charm: 5 }
       }
     };
+
     const answerValues = {
       highly_agree: 3,
       agree: 2,
@@ -368,11 +370,13 @@
       disagree: -2,
       highly_disagree: -3
     };
+
     function startQuiz() {
       document.getElementById("landingSection").classList.add("hidden");
       document.getElementById("quizSection").classList.remove("hidden");
       renderQuestions();
     }
+
     function renderQuestions() {
       const form = document.getElementById("quizForm");
       form.innerHTML = "";
@@ -433,6 +437,7 @@
         form.appendChild(div);
       });
     }
+
     function handleAnswer(questionIndex) {
       const answer = document.querySelector(`input[name="q${questionIndex}"]:checked`).value;
       if (questions[questionIndex].type === "gender") {
@@ -467,11 +472,13 @@
         }, 100);
       }
     }
+
     function updateProgress() {
       const progress = (answeredQuestions / questions.length) * 100;
       document.getElementById("progressBar").style.width = progress + "%";
       document.getElementById("progressText").textContent = `${answeredQuestions} / ${questions.length}`;
     }
+
     function submitQuiz() {
       let scores = { bitch: 0, whore: 0, slut: 0 };
       for (let i = 0; i < questions.length; i++) {
@@ -484,18 +491,26 @@
           scores[questions[i].type] += answerValues[answer.value];
         }
       }
-      const total = Object.values(scores).reduce((a, b) => a + Math.abs(b), 0) || 1;
+
+      // Calculate the total of absolute scores to ensure it's always positive
+      const total = Math.max(Object.values(scores).reduce((a, b) => a + Math.abs(b), 0), 1);
+
+      // Calculate percentages based on absolute scores
       const percentages = {
         bitch: Math.round((Math.abs(scores.bitch) / total) * 100),
         whore: Math.round((Math.abs(scores.whore) / total) * 100),
         slut: Math.round((Math.abs(scores.slut) / total) * 100)
       };
+
+      // Determine the highest score directly from raw scores
       let highestType = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+
       const result = resultsData[highestType];
       document.getElementById("resultImage").src = `${highestType}_${selectedGender}.png`;
       document.getElementById("resultTitle").innerHTML = result.title;
       document.getElementById("resultSubtitle").textContent = result.subtitle;
       document.getElementById("resultDescription").textContent = result.description;
+
       const percentHTML = Object.keys(percentages).map(type => `
         <div class="stat">
           <span class="stat-label">${type}</span>
@@ -505,10 +520,12 @@
           <span class="stat-percentage">${percentages[type]}%</span>
         </div>
       `).join("");
+
       document.getElementById("percentages").innerHTML = percentHTML;
       document.getElementById("quizSection").classList.add("hidden");
       document.getElementById("resultSection").classList.remove("hidden");
     }
+
     function toggleArchetypeDescriptions() {
       const descriptions = document.getElementById("archetypeDescriptions");
       if (descriptions.style.display === "none" || !descriptions.style.display) {
@@ -517,6 +534,7 @@
         descriptions.style.display = "none";
       }
     }
+
     function retryQuiz() {
       document.getElementById("resultSection").classList.add("hidden");
       document.getElementById("landingSection").classList.remove("hidden");
@@ -525,6 +543,7 @@
       answeredQuestions = 0;
       updateProgress();
     }
+
     function randomizeImages() {
       const bitchImage = document.getElementById('bitchImage');
       const whoreImage = document.getElementById('whoreImage');
@@ -545,6 +564,7 @@
         slutImage.src = 'slut_female.png';
       }
     }
+
     window.onload = randomizeImages;
   </script>
 </body>
