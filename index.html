@@ -276,8 +276,8 @@
         <h2 id="resultTitle" class="result-title"></h2>
         <p id="resultSubtitle" class="result-subtitle"></p>
         <p id="resultDescription" class="result-description"></p>
-        <!-- Percentages -->
-        <div id="percentages" class="stats"></div>
+        <!-- Archetype Order -->
+        <div id="archetypeOrder" class="stats"></div>
         <!-- Buttons -->
         <div class="text-center mt-6">
           <button onclick="toggleArchetypeDescriptions()" class="flat-button">
@@ -330,10 +330,10 @@
       { q: "I find it difficult to stand up for myself in disagreements.", type: "slut" },
       { q: "Select your gender:", type: "gender" }
     ];
-
     const resultsData = {
       bitch: {
-        title: "<span class='archetype-emphasis bitch-color'>Bitch</span> – The Mastermind Villain",
+        title: "The Bitch",
+        colorClass: "bitch-color",
         subtitle: "Self-Serving • Calculated • Ruthless",
         description: "They are the architects of their own destiny. Always thinking five steps ahead, they will stop at nothing to achieve their goals — even if it means stepping over anyone in their way. For them, it's never personal; it's simply the art of winning. They command respect, manipulate situations in their favor, and know exactly how to position themselves to win. Their selfishness is not hidden — it's part of their strength. To them, kindness is a luxury, and winning is survival.",
         color: "bg-bitch",
@@ -342,7 +342,8 @@
         stats: { cunning: 5, power: 4, charm: 3 }
       },
       whore: {
-        title: "<span class='archetype-emphasis whore-color'>Whore</span> – The Chaos Villain",
+        title: "The Whore",
+        colorClass: "whore-color",
         subtitle: "Blunt • Unfiltered • Firestarter",
         description: "They were born to stir the pot. Drama follows them not because they need it, but because they can. They speak without a filter, throw shade with precision, and ensure no one ever forgets their presence. Their cruelty isn't strategic — it's instinct. They thrive in chaos, feed off conflict, and find satisfaction in making others squirm. Inherently spiteful, they don't need a reason to create problems; sometimes, watching the world burn is reason enough.",
         color: "bg-whore",
@@ -351,7 +352,8 @@
         stats: { cunning: 3, power: 5, charm: 2 }
       },
       slut: {
-        title: "<span class='archetype-emphasis slut-color'>Slut</span> – The Manipulative Villain",
+        title: "The Slut",
+        colorClass: "slut-color",
         subtitle: "Charming • Approval-Seeking • Spotlight Hunter",
         description: "They know how to work a room, charm their way into hearts, and keep themselves in the spotlight. But beneath the charm lies a desperate need for validation. They bend their morals, align with power, and join in on cruelty if it means protecting their place in someone's heart — or staying at the center of attention. Their villainy often hides behind a smile, but make no mistake: they will gladly tear someone down if it keeps their image intact and their ego fed.",
         color: "bg-slut",
@@ -360,7 +362,6 @@
         stats: { cunning: 4, power: 3, charm: 5 }
       }
     };
-
     const answerValues = {
       highly_agree: 3,
       agree: 2,
@@ -370,13 +371,11 @@
       disagree: -2,
       highly_disagree: -3
     };
-
     function startQuiz() {
       document.getElementById("landingSection").classList.add("hidden");
       document.getElementById("quizSection").classList.remove("hidden");
       renderQuestions();
     }
-
     function renderQuestions() {
       const form = document.getElementById("quizForm");
       form.innerHTML = "";
@@ -437,7 +436,6 @@
         form.appendChild(div);
       });
     }
-
     function handleAnswer(questionIndex) {
       const answer = document.querySelector(`input[name="q${questionIndex}"]:checked`).value;
       if (questions[questionIndex].type === "gender") {
@@ -472,13 +470,11 @@
         }, 100);
       }
     }
-
     function updateProgress() {
       const progress = (answeredQuestions / questions.length) * 100;
       document.getElementById("progressBar").style.width = progress + "%";
       document.getElementById("progressText").textContent = `${answeredQuestions} / ${questions.length}`;
     }
-
     function submitQuiz() {
       let scores = { bitch: 0, whore: 0, slut: 0 };
       for (let i = 0; i < questions.length; i++) {
@@ -492,40 +488,32 @@
         }
       }
 
-      // Calculate the total of absolute scores to ensure it's always positive
-      const total = Math.max(Object.values(scores).reduce((a, b) => a + Math.abs(b), 0), 1);
-
-      // Calculate percentages based on absolute scores
-      const percentages = {
-        bitch: Math.round((Math.abs(scores.bitch) / total) * 100),
-        whore: Math.round((Math.abs(scores.whore) / total) * 100),
-        slut: Math.round((Math.abs(scores.slut) / total) * 100)
-      };
-
       // Determine the highest score directly from raw scores
-      let highestType = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+      let sortedTypes = Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
+
+      const highestType = sortedTypes[0];
+      const secondType = sortedTypes[1];
+      const thirdType = sortedTypes[2];
 
       const result = resultsData[highestType];
       document.getElementById("resultImage").src = `${highestType}_${selectedGender}.png`;
-      document.getElementById("resultTitle").innerHTML = result.title;
+      document.getElementById("resultTitle").innerHTML = `<span class="${result.colorClass}">${result.title}</span>`;
       document.getElementById("resultSubtitle").textContent = result.subtitle;
       document.getElementById("resultDescription").textContent = result.description;
 
-      const percentHTML = Object.keys(percentages).map(type => `
+      const orderHTML = `
         <div class="stat">
-          <span class="stat-label">${type}</span>
-          <div class="stat-bar-container">
-            <div class="stat-bar ${resultsData[type].color}" style="width: ${percentages[type]}%"></div>
-          </div>
-          <span class="stat-percentage">${percentages[type]}%</span>
+          <span class="stat-label">Your secondary archetype is ${resultsData[secondType].title}</span>
         </div>
-      `).join("");
+        <div class="stat">
+          <span class="stat-label">Your tertiary archetype is ${resultsData[thirdType].title}</span>
+        </div>
+      `;
 
-      document.getElementById("percentages").innerHTML = percentHTML;
+      document.getElementById("archetypeOrder").innerHTML = orderHTML;
       document.getElementById("quizSection").classList.add("hidden");
       document.getElementById("resultSection").classList.remove("hidden");
     }
-
     function toggleArchetypeDescriptions() {
       const descriptions = document.getElementById("archetypeDescriptions");
       if (descriptions.style.display === "none" || !descriptions.style.display) {
@@ -534,7 +522,6 @@
         descriptions.style.display = "none";
       }
     }
-
     function retryQuiz() {
       document.getElementById("resultSection").classList.add("hidden");
       document.getElementById("landingSection").classList.remove("hidden");
@@ -543,7 +530,6 @@
       answeredQuestions = 0;
       updateProgress();
     }
-
     function randomizeImages() {
       const bitchImage = document.getElementById('bitchImage');
       const whoreImage = document.getElementById('whoreImage');
@@ -564,7 +550,6 @@
         slutImage.src = 'slut_female.png';
       }
     }
-
     window.onload = randomizeImages;
   </script>
 </body>
